@@ -1,0 +1,40 @@
+vxxxion: 0.2
+
+env:
+  variables:
+    BUILD_VPC_ID: "vpc-04d8d459cbcsffsfc"
+    BUILD_SUBNET_ID: "subnet-03sfsfsgsg0e7f0c"
+    SSH_USER: "ec2-user"
+    AMI_TYPE: ""
+    PACKER_LOG: "0" # change to 1 to enable debug logging
+    AWS_MAX_ATTEMPTS: "60"
+    AWS_POLL_DELAY_SECONDS: "60" # To allow enough time for AMI encryption and copying 
+
+phases:
+  install:
+    commands:
+      - echo "Installing Packer"
+      - aws s3 cp s3://xxx-cloud-bucket/packer/packer_1.3.2_linux_amd64.zip packer.zip && unzip packer.zip
+  pre_build:
+    commands:
+      - echo "Checking out"
+      - git clone https://github.com/diogozedan/base-ami.git && cd base-ami
+      - echo "Validating Packer template"
+      - ${CODEBUILD_SRC_DIR}/packer validate ${AMI_TYPE}.json
+  build:
+    commands:
+      - ${CODEBUILD_SRC_DIR}/packer build -color=false ${AMI_TYPE}.json | tee ${AMI_TYPE}_build.log
+  post_build:
+    commands:
+      - egrep "${AWS_REGION}\:\sami\-" ${AMI_TYPE}_build.log | cut -d' ' -f2 > ${AMI_TYPE}_ami_id.txt
+      # Packer doesn't return non-zero status; we must do that if Packer build failed
+      - test -s ${AMI_TYPE}_ami_id.txt || exit 1
+      #- sed -i.bak "s/<<AMI-ID>>/$(cat ${AMI_TYPE}_ami_id.txt)/g" ami_builder_event.json
+      #- aws events put-events --entries file://ami_builder_event.json
+      - cat ${AMI_TYPE}_ami_id.txt
+      - echo "build completed on `date`"
+artifacts:
+  files:
+    #- ami_builder_event.json
+    - base-ami/${AMI_TYPE}_build.log
+  discard-paths: yes

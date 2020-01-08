@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: true    # gather OS info that is made available for tasks/roles
+  become: yes  # majority of CIS tasks require root
+  vars:
+    ansible_python_interpreter: "/usr/bin/env python" # making sure it uses python 2.7     
+  roles:
+    - common

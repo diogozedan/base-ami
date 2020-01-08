@@ -1,0 +1,83 @@
+{
+  "variables": {
+    "vpc": "{{env `BUILD_VPC_ID`}}",
+    "subnet": "{{env `BUILD_SUBNET_ID`}}",
+    "aws_region": "{{env `AWS_REGION`}}",
+    "ami_type": "{{env `AMI_TYPE`}}",
+    "ssh_user": "{{env `SSH_USER`}}",
+    "http_proxy": "{{env `http_proxy`}}",
+    "https_proxy": "{{env `https_proxy`}}",
+    "no_proxy": "{{env `no_proxy`}}"
+  },
+  "buildxxx": [{
+    "name": "{{user `ami_type`}} AMI Bakery",
+    "type": "amazon-ebs",
+    "region": "{{user `aws_region`}}",
+    "source_ami_filter": {
+        "filtxxx": {
+            "virtualization-type": "hvm",
+            "name": "{{user `ami_type`}}-IMAGE*",
+            "root-device-type": "ebs"
+        },
+        "ownxxx": ["2378235177348"],
+        "most_recent": true
+    },
+    "instance_type": "t3a.micro",
+    "launch_block_device_mappings": [
+      {
+        "device_name": "/dev/sda1",
+        "volume_size": 20,
+        "volume_type": "gp2",
+        "delete_on_termination": true
+      }
+    ],
+    "encrypt_boot": true,
+    "kms_key_id": "alias/ami-{{user `ami_type` | lower}}-ami-key",
+    "ssh_username": "{{user `ssh_user`}}",
+    "ami_name": "IMAGE-{{user `ami_type`}}-IMAGE-{{isotime | clean_ami_name}}",
+    "tags": {
+      "Name": "{{user `ami_type`}}-IMAGE-{{isotime | clean_ami_name}}"
+    },
+    "run_tags": { 
+      "Name": "{{user `ami_type`}}-IMAGE-{{isotime | clean_ami_name}}"
+    },
+    "run_volume_tags": {
+      "Name": "{{user `ami_type`}}-IMAGE-{{isotime | clean_ami_name}}"
+    },
+    "snapshot_tags": {
+      "Name": "{{user `ami_type`}}-IMAGE-{{isotime | clean_ami_name}}"
+    },
+    "ami_description": "{{user `ami_type`}} optimized image. Includes AWS CLI, SSM Agent, CloudWatch Logs Agent, and xxx Security Agents.",
+    "associate_public_ip_address": false,
+    "vpc_id": "{{user `vpc`}}",
+    "subnet_id": "{{user `subnet`}}"
+  }],
+  "provisionxxx": [
+    {
+        "type": "shell",
+        "inline": [
+          "python --version",
+          "sudo yum install -y ansible",
+          "sudo yum install -y python-pip",
+          "ansible --version "
+        ],
+        "remote_folder": "/home/{{user `ssh_user`}}"
+    }, 
+    {
+        "type": "ansible-local",
+        "playbook_file": "ansible/playbook_{{user `ami_type`}}.yaml",
+        "role_paths": [
+            "ansible/roles/ldap",
+            "ansible/roles/common"
+        ],
+        "playbook_dir": "ansible"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "rm .ssh/authorized_keys ; sudo rm /root/.ssh/authorized_keys"
+      ],
+      "remote_folder": "/home/{{user `ssh_user`}}"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+---
+# tasks file for proxy_settings
+
+- name:  Configure sshd Password Authentication
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^PasswordAuthentication.*no"
+    line: "PasswordAuthentication yes"
+    state: present
+  notify:
+  - restart sshd
+
+
+

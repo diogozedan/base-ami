@@ -1,0 +1,70 @@
+{
+  "variables": {
+    "vpc": "{{env `BUILD_VPC_ID`}}",
+    "subnet": "{{env `BUILD_SUBNET_ID`}}",
+    "aws_region": "{{env `AWS_REGION`}}",
+    "ami_type": "{{env `AMI_TYPE`}}",
+    "ssh_user": "{{env `SSH_USER`}}"
+  },
+  "buildxxx": [{
+    "name": "IMAGE {{user `ami_type`}} AMI Bakery",
+    "type": "amazon-ebs",
+    "region": "{{user `aws_region`}}",
+    "source_ami_filter": {
+        "filtxxx": {
+            "virtualization-type": "hvm",
+            "name": "{{user `ami_type`}}-IMAGE*",
+            "root-device-type": "ebs"
+        },
+        "ownxxx": ["234193177348"],
+        "most_recent": true
+    },
+    "instance_type": "t2.micro",
+    "encrypt_boot": true,
+    "kms_key_id": "alias/IMAGE-{{user `ami_type` | lower}}-ami-key",
+    "ssh_username": "{{user `ssh_user`}}",
+    "ami_name": "IMAGE-{{user `ami_type`}}-IMAGE-{{isotime | clean_ami_name}}",
+    "tags": {
+      "Name": "{{user `ami_type`}}-IMAGE-{{isotime | clean_ami_name}}"
+    },
+    "run_tags": { 
+      "Name": "{{user `ami_type`}}-IMAGE-{{isotime | clean_ami_name}}"
+    },
+    "run_volume_tags": {
+      "Name": "{{user `ami_type`}}-IMAGE-{{isotime | clean_ami_name}}"
+    },
+    "snapshot_tags": {
+      "Name": "{{user `ami_type`}}-IMAGE-{{isotime | clean_ami_name}}"
+    },
+    "ami_description": "IMAGE {{user `ami_type`}} optimized image. Includes AWS CLI, SSM Agent, CloudWatch Logs Agent, and xxx Security Agents.",
+    "associate_public_ip_address": false,
+    "vpc_id": "{{user `vpc`}}",
+    "subnet_id": "{{user `subnet`}}"
+  }],
+  "provisionxxx": [
+    {
+        "type": "shell",
+        "inline": [
+            "python --version",
+            "sudo yum install -y ansible",
+            "ansible --version "
+        ],
+        "remote_folder": "/home/{{user `ssh_user`}}"
+    }, 
+    {
+        "type": "ansible-local",
+        "playbook_file": "ansible/playbook_{{user `ami_type`}}.yaml",
+        "role_paths": [
+          "ansible/roles/common"
+        ],
+        "playbook_dir": "ansible"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "rm .ssh/authorized_keys ; sudo rm /root/.ssh/authorized_keys"
+      ],
+      "remote_folder": "/home/{{user `ssh_user`}}"
+    }
+  ]
+}

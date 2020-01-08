@@ -1,0 +1,126 @@
+settings:
+  clean_up_failed_attempts: true
+
+amis:
+  ecs:
+    # Whether this AMI should be baked (true or false)
+    active: true
+    # Name of the Automation Document that will build our AMI
+    document_name: BASE-AMI-Bakery
+    # Parametxxx we should pass the automation document
+    document_parametxxx:
+      # What is the Subnet ID that we should do our baking in?  It must have a route to a NAT Gateway!
+      SubnetId: subnet-0a9a70855b8562b99
+      # The AMI which will be used to launch an instance where packer will be executed.
+      SourceAmiId: ami-060971ab760ccd625
+      # Name of ec2 instance role to use *while baking*.  Must have access to SSM, and ability to read from s3.  See documentation!
+      # Add permissions for any other AWS services accessed during customization scripts!
+      InstanceIamRole: infra-ca-jenkins-role-dev
+      # Name of the SSM role that the automation runs as.  Needs access to start/stop EC2 instances, etc.  See documentation! 936364041274
+      AutomationAssumeRole: infra-ca-jenkins-role-dev
+      # Name of the instance type to use *while baking*.  Larger instances bake more quickly, also if some memory intensive software is
+      # run or installed consider a larger instance type
+      InstanceType: t2.micro
+      # The security group ID(s) for the SSM instance
+      InstanceSecurityGroupIds: sg-04a0bf9b523408799
+      # Base64 Encoded UserData first boot script.  This is a shell script that must install the AWS SSM agent for the rest of the bake to proceed.
+      # The script will vary slightly depending on the vxxxion of Linux used.
+      InstanceUserData: IyEvYmluL2Jhc2gKCiMgU2V0dGluZyB1cCBwcm94eQpleHBvcnQgaHR0cF9wcm94eT0xNzIuMTguMTAwLjE1OjE4NzE3CmV4cG9ydCBodHRwc19wcm94eT0xNzIuMTguMTAwLjE1OjE4NzE3CmV4cG9ydCBub19wcm94eT1sb2NhbGhvc3QsMTI3LjAuMC4xLDE2OS4yNTQuMTY5LjI1NCxlcXVpZmF4LmNvbSxub25wcm9kLmludGwtY2EuYXdzLmVmeCxhd3MuZWZ4LGVmeC5jb20sL3Zhci9ydW4vZG9ja2VyLnNvY2ssZWxiLmFtYXpvbmF3cy5jb20gCgojIFNldHVwIFNTTSBhZ2VudCBwcm94eQpta2RpciAtcCAvZXRjL3N5c3RlbWQvc3lzdGVtL2FtYXpvbi1zc20tYWdlbnQuc2VydmljZS5kCmNkIC9ldGMvc3lzdGVtZC9zeXN0ZW0vYW1hem9uLXNzbS1hZ2VudC5zZXJ2aWNlLmQKdG91Y2ggb3ZlcnJpZGUuY29uZgplY2hvIC1lICJbU2VydmljZV0iID4+IG92ZXJyaWRlLmNvbmYKZWNobyAtZSAiRW52aXJvbm1lbnQ9XCJodHRwX3Byb3h5PWh0dHA6Ly8xNzIuMTguMTAwLjE1OjE4NzE3XCIiID4+IG92ZXJyaWRlLmNvbmYKZWNobyAtZSAiRW52aXJvbm1lbnQ9XCJodHRwc19wcm94eT1odHRwczovLzE3Mi4xOC4xMDAuMTU6MTg3MTdcIiIgPj4gb3ZlcnJpZGUuY29uZgplY2hvIC1lICJFbnZpcm9ubWVudD1cIm5vX3Byb3h5PWxvY2FsaG9zdCwxMjcuMC4wLjEsMTY5LjI1NC4xNjkuMjU0LGVxdWlmYXguY29tLG5vbnByb2QuaW50bC1jYS5hd3MuZWZ4LGF3cy5lZngsZWZ4LmNvbSwvdmFyL3J1bi9kb2NrZXIuc29jayxlbGIuYW1hem9uYXdzLmNvbVwiIiA+PiBvdmVycmlkZS5jb25mCnN5c3RlbWN0bCBzdG9wIGFtYXpvbi1zc20tYWdlbnQKc3lzdGVtY3RsIGRhZW1vbi1yZWxvYWQKc3lzdGVtY3RsIHN0YXJ0IGFtYXpvbi1zc20tYWdlbnQ=
+      # The S3 url to the packer archive
+      PackerArchive: s3://xxx-cloud-intl-ca-nonprod-core-backend/packer/packer_1.3.2_linux_amd64.zip
+      # The AMI type
+      AmiType: ECS
+      # Proxy server address
+      Proxy: 172.18.XXX.XX:18717
+      # List of no proxy addresses
+      NoProxy: localhost,127.0.0.1,169.254.169.254,company.com,nonprod.intl-ca.aws.xxx,aws.xxx,xxx.com,/var/run/docker.sock,elb.amazonaws.com
+      # The Git repo that stores the packer config
+      PackerGitRepo: https://github.com/diogozedan/base-ami.git
+      # The VPC ID where packer will generate the EC2 instance
+      PackerBuildVpcId: vpc-00a9e8535aa66a356
+      # The Subnet ID where packer will generate the EC2 instance
+      PackerBuildSubnetId: subnet-0a9a70855b8562b99
+      # The SSH User packer will use to connect to the instance
+      SshUser: ec2-user
+
+  rhel7:
+    # Whether this AMI should be baked (true or false)
+    active: true
+    # Name of the Automation Document that will build our AMI
+    document_name: BASE-AMI-Bakery
+    # Parametxxx we should pass the automation document
+    document_parametxxx:
+      # What is the Subnet ID that we should do our baking in?  It must have a route to a NAT Gateway!
+      SubnetId: subnet-0a9a70855b8562b99
+      # The AMI which will be used to launch an instance where packer will be executed.
+      SourceAmiId: ami-060971ab760ccd625
+      # Name of ec2 instance role to use *while baking*.  Must have access to SSM, and ability to read from s3.  See documentation!
+      # Add permissions for any other AWS services accessed during customization scripts!
+      InstanceIamRole: infra-ca-jenkins-role-dev
+      # Name of the SSM role that the automation runs as.  Needs access to start/stop EC2 instances, etc.  See documentation! 936364041274
+      AutomationAssumeRole: infra-ca-jenkins-role-dev
+      # Name of the instance type to use *while baking*.  Larger instances bake more quickly, also if some memory intensive software is
+      # run or installed consider a larger instance type
+      InstanceType: t2.micro
+      # The security group ID(s) for the SSM instance
+      InstanceSecurityGroupIds: sg-04a0bf9b523408799
+      # Base64 Encoded UserData first boot script.  This is a shell script that must install the AWS SSM agent for the rest of the bake to proceed.
+      # The script will vary slightly depending on the vxxxion of Linux used.
+      InstanceUserData: IyEvYmluL2Jhc2gKCiMgU2V0dGluZyB1cCBwcm94eQpleHBvcnQgaHR0cF9wcm94eT0xNzIuMTguMTAwLjE1OjE4NzE3CmV4cG9ydCBodHRwc19wcm94eT0xNzIuMTguMTAwLjE1OjE4NzE3CmV4cG9ydCBub19wcm94eT1sb2NhbGhvc3QsMTI3LjAuMC4xLDE2OS4yNTQuMTY5LjI1NCxlcXVpZmF4LmNvbSxub25wcm9kLmludGwtY2EuYXdzLmVmeCxhd3MuZWZ4LGVmeC5jb20sL3Zhci9ydW4vZG9ja2VyLnNvY2ssZWxiLmFtYXpvbmF3cy5jb20gCgojIFNldHVwIFNTTSBhZ2VudCBwcm94eQpta2RpciAtcCAvZXRjL3N5c3RlbWQvc3lzdGVtL2FtYXpvbi1zc20tYWdlbnQuc2VydmljZS5kCmNkIC9ldGMvc3lzdGVtZC9zeXN0ZW0vYW1hem9uLXNzbS1hZ2VudC5zZXJ2aWNlLmQKdG91Y2ggb3ZlcnJpZGUuY29uZgplY2hvIC1lICJbU2VydmljZV0iID4+IG92ZXJyaWRlLmNvbmYKZWNobyAtZSAiRW52aXJvbm1lbnQ9XCJodHRwX3Byb3h5PWh0dHA6Ly8xNzIuMTguMTAwLjE1OjE4NzE3XCIiID4+IG92ZXJyaWRlLmNvbmYKZWNobyAtZSAiRW52aXJvbm1lbnQ9XCJodHRwc19wcm94eT1odHRwczovLzE3Mi4xOC4xMDAuMTU6MTg3MTdcIiIgPj4gb3ZlcnJpZGUuY29uZgplY2hvIC1lICJFbnZpcm9ubWVudD1cIm5vX3Byb3h5PWxvY2FsaG9zdCwxMjcuMC4wLjEsMTY5LjI1NC4xNjkuMjU0LGVxdWlmYXguY29tLG5vbnByb2QuaW50bC1jYS5hd3MuZWZ4LGF3cy5lZngsZWZ4LmNvbSwvdmFyL3J1bi9kb2NrZXIuc29jayxlbGIuYW1hem9uYXdzLmNvbVwiIiA+PiBvdmVycmlkZS5jb25mCnN5c3RlbWN0bCBzdG9wIGFtYXpvbi1zc20tYWdlbnQKc3lzdGVtY3RsIGRhZW1vbi1yZWxvYWQKc3lzdGVtY3RsIHN0YXJ0IGFtYXpvbi1zc20tYWdlbnQ=
+      # The S3 url to the packer archive
+      PackerArchive: s3://xxx-/packer/packer_1.3.2_linux_amd64.zip
+      # The AMI type
+      AmiType: RHEL7
+      # Proxy server address
+      Proxy: 172.18.XXX.XX:18717
+      # List of no proxy addresses
+      NoProxy: localhost,127.0.0.1,169.254.169.254,company.com,nonprod.intl-ca.aws.xxx,aws.xxx,xxx.com,/var/run/docker.sock,elb.amazonaws.com
+      # The Git repo that stores the packer config
+      PackerGitRepo: https://github.com/diogozedan/base-ami.git
+      # The VPC ID where packer will generate the EC2 instance
+      PackerBuildVpcId: vpc-00a9e8535aa66a356
+      # The Subnet ID where packer will generate the EC2 instance
+      PackerBuildSubnetId: subnet-0a9a70855b8562b99
+      # The SSH User packer will use to connect to the instance
+      SshUser: ec2-user
+
+  centos7:
+    # Whether this AMI should be baked (true or false)
+    active: true
+    # Name of the Automation Document that will build our AMI
+    document_name: BASE-AMI-Bakery
+    # Parametxxx we should pass the automation document
+    document_parametxxx:
+      # What is the Subnet ID that we should do our baking in?  It must have a route to a NAT Gateway!
+      SubnetId: subnet-0a9a70855b8562b99
+      # The AMI which will be used to launch an instance where packer will be executed.
+      SourceAmiId: ami-060971ab760ccd625
+      # Name of ec2 instance role to use *while baking*.  Must have access to SSM, and ability to read from s3.  See documentation!
+      # Add permissions for any other AWS services accessed during customization scripts!
+      InstanceIamRole: infra-ca-jenkins-role-dev
+      # Name of the SSM role that the automation runs as.  Needs access to start/stop EC2 instances, etc.  See documentation! 936364041274
+      AutomationAssumeRole: infra-ca-jenkins-role-dev
+      # Name of the instance type to use *while baking*.  Larger instances bake more quickly, also if some memory intensive software is
+      # run or installed consider a larger instance type
+      InstanceType: t2.micro
+      # The security group ID(s) for the SSM instance
+      InstanceSecurityGroupIds: sg-04a0bf9b523408799
+      # Base64 Encoded UserData first boot script.  This is a shell script that must install the AWS SSM agent for the rest of the bake to proceed.
+      # The script will vary slightly depending on the vxxxion of Linux used.
+      InstanceUserData: IyEvYmluL2Jhc2gKCiMgU2V0dGluZyB1cCBwcm94eQpleHBvcnQgaHR0cF9wcm94eT0xNzIuMTguMTAwLjE1OjE4NzE3CmV4cG9ydCBodHRwc19wcm94eT0xNzIuMTguMTAwLjE1OjE4NzE3CmV4cG9ydCBub19wcm94eT1sb2NhbGhvc3QsMTI3LjAuMC4xLDE2OS4yNTQuMTY5LjI1NCxlcXVpZmF4LmNvbSxub25wcm9kLmludGwtY2EuYXdzLmVmeCxhd3MuZWZ4LGVmeC5jb20sL3Zhci9ydW4vZG9ja2VyLnNvY2ssZWxiLmFtYXpvbmF3cy5jb20gCgojIFNldHVwIFNTTSBhZ2VudCBwcm94eQpta2RpciAtcCAvZXRjL3N5c3RlbWQvc3lzdGVtL2FtYXpvbi1zc20tYWdlbnQuc2VydmljZS5kCmNkIC9ldGMvc3lzdGVtZC9zeXN0ZW0vYW1hem9uLXNzbS1hZ2VudC5zZXJ2aWNlLmQKdG91Y2ggb3ZlcnJpZGUuY29uZgplY2hvIC1lICJbU2VydmljZV0iID4+IG92ZXJyaWRlLmNvbmYKZWNobyAtZSAiRW52aXJvbm1lbnQ9XCJodHRwX3Byb3h5PWh0dHA6Ly8xNzIuMTguMTAwLjE1OjE4NzE3XCIiID4+IG92ZXJyaWRlLmNvbmYKZWNobyAtZSAiRW52aXJvbm1lbnQ9XCJodHRwc19wcm94eT1odHRwczovLzE3Mi4xOC4xMDAuMTU6MTg3MTdcIiIgPj4gb3ZlcnJpZGUuY29uZgplY2hvIC1lICJFbnZpcm9ubWVudD1cIm5vX3Byb3h5PWxvY2FsaG9zdCwxMjcuMC4wLjEsMTY5LjI1NC4xNjkuMjU0LGVxdWlmYXguY29tLG5vbnByb2QuaW50bC1jYS5hd3MuZWZ4LGF3cy5lZngsZWZ4LmNvbSwvdmFyL3J1bi9kb2NrZXIuc29jayxlbGIuYW1hem9uYXdzLmNvbVwiIiA+PiBvdmVycmlkZS5jb25mCnN5c3RlbWN0bCBzdG9wIGFtYXpvbi1zc20tYWdlbnQKc3lzdGVtY3RsIGRhZW1vbi1yZWxvYWQKc3lzdGVtY3RsIHN0YXJ0IGFtYXpvbi1zc20tYWdlbnQ=
+      # The S3 url to the packer archive
+      PackerArchive: s3://xxx-cloud-intl-ca-nonprod-core-backend/packer/packer_1.3.2_linux_amd64.zip
+      # The AMI type
+      AmiType: CentOS7
+      # Proxy server address
+      Proxy: 172.18.XXX.XX:18717
+      # List of no proxy addresses
+      NoProxy: localhost,127.0.0.1,169.254.169.254,company.com,nonprod.intl-ca.aws.xxx,aws.xxx,xxx.com,/var/run/docker.sock,elb.amazonaws.com
+      # The Git repo that stores the packer config
+      PackerGitRepo: https://github.com/diogozedan/base-ami.git
+      # The VPC ID where packer will generate the EC2 instance
+      PackerBuildVpcId: vpc-00a9e8535aa66a356
+      # The Subnet ID where packer will generate the EC2 instance
+      PackerBuildSubnetId: subnet-0a9a70855b8562b99
+      # The SSH User packer will use to connect to the instance
+      SshUser: centos

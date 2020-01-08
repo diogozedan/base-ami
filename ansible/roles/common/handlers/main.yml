@@ -1,0 +1,24 @@
+- name: restart ssm
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: amazon-ssm-agent
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: restart cloudwatch
+  systemd:
+    name: amazon-cloudwatch-agent
+    state: restarted
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: restart ssm
+  service:
+    state: restarted
+    name: amazon-ssm-agent
+  when: ansible_distribution == 'Amazon'
+
+- name: restart cloudwatch
+  service:
+    name: amazon-cloudwatch-agent
+    state: restarted
+  when: ansible_distribution == 'Amazon'

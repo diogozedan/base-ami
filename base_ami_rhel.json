@@ -1,0 +1,62 @@
+{
+  "variables": {
+    "vpc": "vpc-04d8d459cbc346efc",
+    "subnet": "subnet-03fa760275a0e7f0c",
+    "aws_region": "ca-central-1",
+    "ami_name": "{{env `OS_NAME`}}-IMAGE-{{isotime \"02-Jan-06 03_04_05\"}}",
+    "source_ami_filter": "RHEL7-IMAGE*"
+  },
+  "buildxxx": [{
+    "name": "AWS AMI Builder - IMAGE",
+    "type": "amazon-ebs",
+    "region": "{{user `aws_region`}}",
+    "source_ami_filter": {
+      "filtxxx": {
+        "virtualization-type": "hvm",
+        "root-device-type": "ebs",
+        "name": "RHEL7-CIS*"
+      },
+      "ownxxx": [
+        "441770298408"
+      ],
+      "most_recent": true
+    },
+      "instance_type": "t2.micro",
+      "ssh_username": "ec2-user",
+      "ami_name": "{{user `ami_name` | clean_ami_name}}",
+      "tags": {
+        "Name": "{{user `ami_name`}}"
+      },
+      "run_tags": {
+        "Name": "{{user `ami_name`}}"
+      },
+      "run_volume_tags": {
+        "Name": "{{user `ami_name`}}"
+      },
+      "snapshot_tags": {
+        "Name": "{{user `ami_name`}}"
+      },
+      "ami_description": "Amazon AMI - {{user `ami_name`}}",
+      "associate_public_ip_address": "false",
+      "vpc_id": "{{user `vpc`}}",
+      "subnet_id": "{{user `subnet`}}",
+      "encrypt_boot": true,
+      "kms_key_id": "arn:aws:kms:ca-central-1:936364041274:key/f2b208fc-c9b5-4577-8d61-6f5e557c3906"
+  }],
+    "provisionxxx": [
+      {
+        "type": "ansible-local",
+        "playbook_file": "ansible/playbook.yaml",
+        "role_paths": [
+          "ansible/roles/common"
+        ],
+        "playbook_dir": "ansible"
+      },
+      {
+        "type": "shell",
+        "inline": [
+          "rm .ssh/authorized_keys ; sudo rm /root/.ssh/authorized_keys"
+        ]
+      }
+    ]
+  }

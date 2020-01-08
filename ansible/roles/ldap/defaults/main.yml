@@ -1,0 +1,12 @@
+---
+# defaults file for lae.system_ldap
+# The following are used to populate sssd.conf (see templates/sssd.conf.j2)
+# Refer to `man sssd-ldap` (https://linux.die.net/man/5/sssd-ldap) for usage.
+system_ldap_allow_passwordauth_in_sshd: false
+system_ldap_krb5_realm: MDC.xxx.company.COM
+system_ldap_search_base: DC=mdc,DC=xxx,DC=company,DC=com
+system_ldap_bind_dn: cn=unixclient-proxy,ou=serviceaccounts,ou=accounts,ou=accessmgmnt,dc=xxx,dc=company,dc=com
+system_ldap_domain: xxx.company.com
+system_ldap_sudo_usxxx: []
+system_ldap_sudo_groups: ['aws_intl-ca_devops_jenkins_usxxx','sg_nc_canada_devops_test','cn_canada_cloud_dev_sudouser']
+system_ldap_uris: ldap://mdc.xxx.company.com:389

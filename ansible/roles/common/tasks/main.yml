@@ -1,0 +1,73 @@
+# tasks file for Common settings
+- name: Copy company CA Trust Certificate
+  template:
+    src: ca-trust.j2
+    dest: /etc/pki/ca-trust/source/anchors/companyCA2024.crt
+
+- name: Update Cert Trust
+  shell: /usr/bin/update-ca-trust
+
+- name: upgrade ecs-init
+  yum: 
+    name: ecs-init 
+    state: latest
+  when: ansible_distribution == 'Amazon' 
+
+- name: Run script for proxy
+  script: proxy.sh
+  when: ansible_distribution == 'Amazon'
+
+- name: Change environment variables
+  template:
+    src: environment.j2
+    dest: /etc/environment
+
+- name: Activate env variables
+  shell: source /etc/environment
+
+- name: Installing Botocore
+  pip:
+    name: botocore
+    extra_args: --upgrade
+    umask: "0026"
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Change proxy settings for Cloudwatch
+  template:
+    src: common-config.j2
+    dest: /opt/aws/amazon-cloudwatch-agent/etc/common-config.toml
+  notify: restart cloudwatch
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Create Folder amazon-ssm-agent.service.d
+  file: 
+    path: /etc/systemd/system/amazon-ssm-agent.service.d
+    owner: root
+    group: root 
+    mode: 0755 
+    state: directory
+
+- name: Copy override configuration for SSM
+  template:
+    src: override.j2
+    dest: /etc/systemd/system/amazon-ssm-agent.service.d/override.conf
+
+- name: Set Local TimeZone to EST
+  timezone:
+    name: Canada/Eastern
+
+- name:  Change Cloud Config Settings
+  lineinfile:
+    dest: /etc/cloud/cloud.cfg
+    regexp: "^ssh_pwauth.*0"
+    line: "ssh_pwauth:   1"
+    state: present
+
+- name: Change Files permissions
+  file:
+    path: /usr/lib/python2.7/site-packages
+    owner: root
+    group: root
+    recurse: yes
+    # when specifying mode using octal numbxxx, add a leading 0
+    mode: 0755

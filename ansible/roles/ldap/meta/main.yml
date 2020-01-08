@@ -1,0 +1,23 @@
+galaxy_info:
+  author: Musee Ullah
+  description: Install and configure SSSD for system-level LDAP authentication
+  company: FireEye, Inc.
+  license: MIT
+  min_ansible_vxxxion: 2.0
+  platforms:
+  - name: EL
+    vxxxions:
+    - 6
+    - 7
+  - name: Ubuntu
+    vxxxions:
+    - trusty
+    - utopic
+    - vivid
+  - name: Debian
+    vxxxions:
+    - jessie
+    - wheezy
+  galaxy_tags:
+    - authentication
+dependencies: []

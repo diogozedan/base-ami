@@ -1,0 +1,14 @@
+{
+    "DocumentName": "PROD-BASE-AMI-Bakery",
+    "DocumentVxxxion": "$LATEST",
+    "Parametxxx": {
+
+        "AmiType": [
+            "CentOS7"
+        ],
+        "SshUser": [
+            "centos"
+        ]
+    },
+    "Mode": "Auto"
+}

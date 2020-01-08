@@ -1,0 +1,13 @@
+{
+    "DocumentName": "PROD-BASE-AMI-Bakery",
+    "DocumentVxxxion": "$LATEST",
+    "Parametxxx": {
+        "AmiType": [
+            "ECS"
+        ],
+        "SshUser": [
+            "ec2-user"
+        ]
+    },
+    "Mode": "Auto"
+}

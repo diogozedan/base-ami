@@ -1,0 +1,184 @@
+# {{ ansible_managed }}
+{# one domain, no reason for multiple at time of writing #}
+[domain/{{ system_ldap_domain }}]
+[sssd]
+debug_level = 9
+config_file_vxxxion = 2
+reconnection_retries = 3
+domains = xxx.company.com
+services = nss, pam
+[nss]
+debug_level = 9
+filter_groups = root
+filter_usxxx = root,ldap,named,avahi,haldaemon,dbus,radiusd,news,nscd
+reconnection_retries = 3
+entry_cache_nowait_percentage = 75
+default_shell = /bin/bash
+
+
+[pam]
+debug_level = 9
+reconnection_retries = 3
+offline_credentials_expiration = 0
+offline_failed_login_attempts = 0
+offline_failed_login_delay = 5
+
+[domain/mdc.xxx.company.com]
+debug_level = 9
+id_provider = ldap
+auth_provider = krb5
+chpass_provider = ldap
+access_provider = ldap
+min_id = 500
+#krb5_realm = MDC.xxx.company.COM
+krb5_realm = {{ system_ldap_krb5_realm | default(system_ldap_domain, true) }}
+krb5_auth_timeout = 60
+#ad_server = yulxxxdc1.xxx.company.com
+ldap_uri = ldap://mdc.xxx.company.com:389
+#ldap_uri = {{ system_ldap_uris | join(',') }}
+ldap_tls_reqcert = allow
+ldap_schema = ad
+ldap_id_mapping = False
+ldap_user_objectsid = objectSid
+cache_credentials = True
+ldap_id_use_start_tls = False
+#ldap_default_bind_dn = cn=unixclient-proxy,ou=serviceaccounts,ou=accounts,ou=accessmgmnt,dc=xxx,dc=company,dc=com
+ldap_default_bind_dn = {{ system_ldap_bind_dn }}
+ldap_default_authtok_type = obfuscated_password
+ldap_default_authtok = AAAQAE5IVEAcJKM3MRUskoDQPJmqNfjymAA7C+PzlV2iTmj7PJ7Sm3En29amMmm6GFevm1vA1FG8goAJrb2WpWEVp7IAAQID
+#ldap_search_base = DC=mdc,DC=xxx,DC=company,DC=com
+ldap_search_base = {{ system_ldap_search_base }}
+ldap_user_search_base = DC=mdc,DC=xxx,DC=company,DC=com
+ldap_group_search_base = DC=mdc,DC=xxx,DC=company,DC=com
+ldap_user_object_class = user
+ldap_user_name = sAMAccountName
+ldap_user_uid_number = uidNumber
+ldap_user_gid_number = gidNumber
+ldap_group_gid_number = gidNumber
+ldap_user_home_directory = unixHomeDirectory
+ldap_user_shell = loginShell
+ldap_user_principal = userPrincipalName
+ldap_group_object_class = group
+ldap_force_upper_case_realm = True
+fallback_homedir = /export/home/%u
+
+
+
+[domain/xxx.company.com]
+debug_level = 0
+id_provider = ldap
+auth_provider = krb5
+chpass_provider = ldap
+access_provider = ldap
+# min_id and max_id are the UID and GID limits for the domain.
+# If a domain contains an entry that is outside these limits, it is ignored.
+min_id = 500
+#max_id =
+
+########### Begin test
+# pwd and user expiry, to be tested
+# SET Account expiration to shadowAccount
+#*ldap_account_expire_policy = shadow*
+# SET Password expiration to none
+#*ldap_pwd_policy = none*
+# SET access verification to ldap filter then check shadow account expiration
+#*ldap_access_order *= filter, *expire*
+#ldap_chpass_update_last_change = false
+# SET attribute. Redundant, It is default
+#ldap_user_shadow_expire = shadowExpire
+########### End test
+# Uncomment if service discovery is not working
+ldap_uri = ldap://yulxxxdc1.xxx.company.com:389,ldap://atlxxxdc1.xxx.company.com:389,ldap://atlxxxdc2.xxx.company.com:389,ldap://bhxxxxdc1.xxx.company.com:389
+# SSSD always uses an encrypted channel for authentication, which ensures that passwords are never sent over the network unencrypted.
+# With ldap_id_use_start_tls = true, identity lookups (such as commands based on the id or getent utilities) are also encrypted.
+# If we are using ldaps then we need to use the certificate to connect, or else SSSD will not work.
+#ldap_tls_cacert = /etc/openldap/cacerts/ssl-cacerts.cer
+ldap_tls_reqcert = allow
+
+ldap_schema = ad
+# Uncomment if dns discovery of your AD servxxx isn't working.
+# By default, the AD provider will map UID and GID values from the objectSID parameter in Active Directory. For details on this,
+# see the "ID MAPPING" section below.
+# If you want to disable ID mapping and instead rely on POSIX attributes defined in Active Directory, you should set ldap_id_mapping = false
+ldap_id_mapping = False
+# Determines if user credentials are also cached in the local LDB cache. User credentials are stored in a SHA512 hash, not in plaintext
+cache_credentials = True
+#entry_cache_timeout = 5400
+
+# Define these only if anonymous binds are not allowed and no keytab is available
+# Enabling use_start_tls is very important, otherwise the bind password is transmitted
+# over the network in the clear
+ldap_id_use_start_tls = False
+ldap_default_bind_dn = cn=unixclient-proxy,ou=serviceaccounts,ou=accounts,ou=accessmgmnt,dc=xxx,dc=company,dc=com
+ldap_default_authtok_type = obfuscated_password
+ldap_default_authtok = AAAQALCiLnD0Pp5kWZN8cOovLbkNF5tZozzsHDrtotAW+5IOaBP348PSXND+OmzgJNCSbTulGq4nKpK4TY4DAP7QX1gAAQID
+ldap_user_uuid = entryuuid
+ldap_group_uuid = entryuuid
+ldap_user_home_directory = unixHomeDirectory
+fallback_homedir = /home/%u
+# Override the user's home directory. You can either provide an absolute value or a template.
+# In the template, the following sequences are substituted:
+#override_homedir = /home/%u
+# After a while of searching
+# I found one site (http://support.hp.com/us-en/document/c02820186)
+# that has it right! Instead of the equal you have to use the comma character.
+#ldap_user_search_base,OU=useraccounts,OU=accounts,OU=accessmgmnt,DC=xxx,DC=company,DC=com
+#ldap_user_search_base,OU=serviceaccounts,OU=accounts,OU=accessmgmnt,DC=xxx,DC=company,DC=com
+#ldap_group_search_base,OU=usergroups,OU=accessmgmnt,DC=xxx,DC=company,DC=com
+#ldap_group_search_base,OU=privilegedgroups,OU=accessmgmnt,DC=xxx,DC=company,DC=com
+#ldap_group_search_base,OU=logingroups,OU=accessmgmnt,DC=xxx,DC=company,DC=com
+#ldap_group_search_base,OU=unixlogingroups,OU=accessmgmnt,DC=xxx,DC=company,DC=com
+#ldap_group_search_base,OU=appvmcontroller,OU=appgroups,OU=accessmgmnt,DC=xxx,DC=company,DC=com
+ldap_user_principal = userPrincipalName
+ldap_force_upper_case_realm = True
+ldap_user_objectsid = objectSid
+#ldap_idmap_range_min = 100000
+#ldap_idmap_range_max = 2000100000
+#ldap_idmap_range_size = 2000000000
+ldap_referrals = True
+ldap_search_timeout = 5
+ldap_network_timeout = 5
+#ldap_search_base = OU=accessmgmnt,DC=xxx,DC=company,DC=com
+#ldap_user_search_base = OU=useraccounts,OU=accounts,OU=accessmgmnt,DC=xxx,DC=company,DC=com
+ldap_search_base = OU=accounts,OU=accessmgmnt,DC=xxx,DC=company,DC=com
+ldap_group_search_base = OU=accessmgmnt,DC=xxx,DC=company,DC=com
+# Perhaps you need to redirect to certain attributes?
+# ldap_user_object_class = user
+# ldap_user_name = sAMAccountName
+# ldap_user_uid_number = msSFU30UidNumber
+# ldap_user_gid_number = msSFU30GidNumber
+# ldap_user_gecos = displayName
+# ldap_user_home_directory = msSFU30HomeDirectory
+# ldap_user_shell = msSFU30LoginShell
+# ldap_user_principal = userPrincipalName
+# ldap_group_object_class = group
+# ldap_group_name = cn
+# ldap_group_gid_number = msSFU30GidNumber
+
+# ldap_access_filter, if using access_provider = ldap, this option is mandatory.
+# It specifies an LDAP search filter criteria that must be met for the user to be granted access on this host.
+# If access_provider = ldap and this option is not set, it will result in all usxxx being denied access.
+# Use access_provider = allow to change this default behaviour.
+
+# Use below string for multiple groups. I've split the line to make it easier to read but you must put everything on the same line.
+#ldap_access_filter = (|
+#(&(objectClass=user)(memberof:1.2.840.113556.1.4.1941:=cn=sg_ca_davinci_dev,ou=servergroups,ou=accessmgmnt,dc=xxx,dc=company,dc=com))
+#(&(objectClass=user)(memberof:1.2.840.113556.1.4.1941:=cn=sg_ca_carwash_dev,ou=servergroups,ou=accessmgmnt,dc=xxx,dc=company,dc=com))
+#)
+
+# Use below string for single group.
+#ldap_access_filter = (&(objectClass=user)(memberof:1.2.840.113556.1.4.1941:=cn=xxx_ca_sa,ou=usergroups,ou=accessmgmnt,dc=xxx,dc=company,dc=com))
+#ldap_access_order = filter, host, authorized_service
+# KRB5
+krb5_realm = xxx.company.COM
+krb5_server = yulxxxdc1.xxx.company.com
+krb5_kdcip = yulxxxdc1.xxx.company.com
+krb5_kpasswd = yulxxxdc1.xxx.company.com
+krb5_store_password_if_offline = True
+#krb5_auth_timeout = 15
+krb5_ccname_template = FILE:/tmp/krb5cc_%U
+krb5_use_kdcinfo = False
+#krb5_use_enterprise_principal = true
+
+
+ldap_access_filter = (|(&(objectClass=user)(memberof:1.2.840.113556.1.4.1941:=cn=xxx_ca_sa,ou=usergroups,ou=accessmgmnt,dc=xxx,dc=company,dc=com))(&(objectClass=user)(memberof:1.2.840.113556.1.4.1941:=cn=xxx_accessmgmnt,ou=usergroups,ou=accessmgmnt,dc=xxx,dc=company,dc=com))(&(objectClass=user)(memberof:1.2.840.113556.1.4.1941:=cn=sg_nc_canada_devops_test,ou=servergroups,ou=accessmgmnt,dc=xxx,dc=company,dc=com))(&(objectClass=user)(memberof:=cn=cn_canada_cloud_dev_user,ou=logingroups,ou=accessmgmnt,dc=xxx,dc=company,dc=com)))

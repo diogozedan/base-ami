@@ -1,0 +1,165 @@
+{
+  "schemaVxxxion": "0.3",
+  "description": "xxx Automation Document to build a customized / encrypted AMI from a public image",
+  "assumeRole": "arn:aws:iam::{{global:ACCOUNT_ID}}:role/{{AutomationAssumeRole}}",
+  "parametxxx": {
+    "AutomationAssumeRole": {
+      "type": "String",
+      "description": "(Required) Role to be assumed",
+      "default": "infra-ca-jenkins-role-dev"
+    },
+    "SubnetId": {
+      "type": "String",
+      "description": "(Required) ID of the Subnet to bake in.  Must have a NAT Gateway attached!",
+      "default": "subnet-0a9a70855b8562b99"
+    },
+    "SourceAmiId": {
+      "type": "String",
+      "description": "(Required) The source Amazon Machine Image ID.",
+      "default": "ami-060971ab760ccd625"
+    },
+    "InstanceIamRole": {
+      "type": "String",
+      "description": "Name of the instance profile allowing SSM management, and s3 access to download script bundles.",
+      "default": "infra-ca-jenkins-role-dev"
+    },
+    "InstanceSecurityGroupIds": {
+      "type": "String",
+      "description": "Security Group(s) the instance will use.",
+      "default": "sg-04a0bf9b523408799"
+    },
+    "InstanceType": {
+      "type": "String",
+      "description": "Type of instance to launch as the workspace host. Instance types vary by region. Default is t2.micro.",
+      "default": "t2.micro"
+    },
+    "InstanceUserData": {
+      "type": "String",
+      "description": "Base64 Encoded UserData for baking.  Must include SSM agent installation.",
+      "default": "IyEvYmluL2Jhc2gKCiMgU2V0dGluZyB1cCBwcm94eQpleHBvcnQgaHR0cF9wcm94eT0xNzIuMTguMTAwLjE1OjE4NzE3CmV4cG9ydCBodHRwc19wcm94eT0xNzIuMTguMTAwLjE1OjE4NzE3CmV4cG9ydCBub19wcm94eT1sb2NhbGhvc3QsMTI3LjAuMC4xLDE2OS4yNTQuMTY5LjI1NCxlcXVpZmF4LmNvbSxub25wcm9kLmludGwtY2EuYXdzLmVmeCxhd3MuZWZ4LGVmeC5jb20sL3Zhci9ydW4vZG9ja2VyLnNvY2ssZWxiLmFtYXpvbmF3cy5jb20gCgojIFNldHVwIFNTTSBhZ2VudCBwcm94eQpta2RpciAtcCAvZXRjL3N5c3RlbWQvc3lzdGVtL2FtYXpvbi1zc20tYWdlbnQuc2VydmljZS5kCmNkIC9ldGMvc3lzdGVtZC9zeXN0ZW0vYW1hem9uLXNzbS1hZ2VudC5zZXJ2aWNlLmQKdG91Y2ggb3ZlcnJpZGUuY29uZgplY2hvIC1lICJbU2VydmljZV0iID4+IG92ZXJyaWRlLmNvbmYKZWNobyAtZSAiRW52aXJvbm1lbnQ9XCJodHRwX3Byb3h5PWh0dHA6Ly8xNzIuMTguMTAwLjE1OjE4NzE3XCIiID4+IG92ZXJyaWRlLmNvbmYKZWNobyAtZSAiRW52aXJvbm1lbnQ9XCJodHRwc19wcm94eT1odHRwczovLzE3Mi4xOC4xMDAuMTU6MTg3MTdcIiIgPj4gb3ZlcnJpZGUuY29uZgplY2hvIC1lICJFbnZpcm9ubWVudD1cIm5vX3Byb3h5PWxvY2FsaG9zdCwxMjcuMC4wLjEsMTY5LjI1NC4xNjkuMjU0LGVxdWlmYXguY29tLG5vbnByb2QuaW50bC1jYS5hd3MuZWZ4LGF3cy5lZngsZWZ4LmNvbSwvdmFyL3J1bi9kb2NrZXIuc29jayxlbGIuYW1hem9uYXdzLmNvbVwiIiA+PiBvdmVycmlkZS5jb25mCnN5c3RlbWN0bCBzdG9wIGFtYXpvbi1zc20tYWdlbnQKc3lzdGVtY3RsIGRhZW1vbi1yZWxvYWQKc3lzdGVtY3RsIHN0YXJ0IGFtYXpvbi1zc20tYWdlbnQ="
+    },
+    "PackerArchive": {
+      "type": "String",
+      "description": "s3 url to the Packer archive",
+      "default": "s3://xxx-cloud-intl-ca-nonprod-core-backend/packer/packer_1.3.4_linux_amd64.zip"
+    },
+    "AmiType": {
+      "type": "String",
+      "description": "Type of the ami being baked e.g. CentOS7, RHEL7, ECS etc.",
+      "default": "CentOS7"
+    },
+    "Proxy": {
+      "type": "String",
+      "description": "company proxy server ip:port",
+      "default": "172.18.100.15:18717"
+    },
+    "NoProxy": {
+      "type": "String",
+      "description": "company noproxy values",
+      "default": "localhost,127.0.0.1,169.254.169.254,company.com,nonprod.intl-ca.aws.xxx,aws.xxx,xxx.com,/var/run/docker.sock,elb.amazonaws.com"
+    },
+    "PackerBuildVpcId": {
+      "type": "String",
+      "description": "VPC in which Packer will instantiate the instance",
+      "default": "vpc-00a9e8535aa66a356"
+    },
+    "PackerBuildSubnetId": {
+      "type": "String",
+      "description": "Subnet in which Packer will instantiate the instance",
+      "default": "subnet-0a9a70855b8562b99"
+    },
+    "SshUser": {
+      "type": "String",
+      "description": "SSH user which Packer will use to log into the instance",
+      "default": "centos"
+    },
+    "PackerGitRepo": {
+      "type": "String",
+      "description": "Git repo (with creds) which contains packer code",
+      "default": "https://github.com/diogozedan/base-ami.git"
+    }
+  },
+  "mainSteps": [
+    {
+      "name": "launchInstance",
+      "action": "aws:runInstances",
+      "maxAttempts": 3,
+      "timeoutSeconds": 1200,
+      "onFailure": "Abort",
+      "inputs": {
+        "BlockDeviceMappings" : [
+          {
+            "DeviceName" : "/dev/sda1",
+            "Ebs" : { 
+              "VolumeSize" : "8",
+              "VolumeType" : "gp2",
+              "DeleteOnTermination":"true"
+            }
+         }
+        ],
+        "ImageId": "{{SourceAmiId}}",
+        "InstanceType": "{{InstanceType}}",
+        "UserData": "{{InstanceUserData}}",
+        "MinInstanceCount": 1,
+        "MaxInstanceCount": 1,
+        "IamInstanceProfileName": "{{InstanceIamRole}}",
+        "SubnetId": "{{SubnetId}}",
+        "KeyName": "xxx-ecs-us-east-1",
+        "SecurityGroupIds": ["{{InstanceSecurityGroupIds}}"]
+      }
+    },
+    {
+      "name": "runPacker",
+      "action": "aws:runCommand",
+      "maxAttempts": 1,
+      "timeoutSeconds": 3600,
+      "onFailure": "step:terminateInstance",
+      "inputs": {
+        "DocumentName": "AWS-RunShellScript",
+        "InstanceIds": [
+          "{{launchInstance.InstanceIds}}"
+        ],
+        "Parametxxx": {
+          "commands": [
+            "set -e",
+            "export http_proxy={{Proxy}}",
+            "export https_proxy={{Proxy}}",
+            "export no_proxy={{NoProxy}}",
+            "export BUILD_VPC_ID={{PackerBuildVpcId}}",
+            "export BUILD_SUBNET_ID={{PackerBuildSubnetId}}",
+            "export SSH_USER={{SshUser}}",
+            "export AMI_TYPE={{AmiType}}",
+            "export AWS_MAX_ATTEMPTS=60",
+            "export AWS_POLL_DELAY_SECONDS=60",
+            "rm -rf /tmp/workspace",
+            "mkdir -p /tmp/workspace",
+            "cd /tmp/workspace",
+            "aws s3 cp {{PackerArchive}} packer.zip",
+            "unzip packer.zip",
+            "sudo yum install git -y",
+            "git clone {{PackerGitRepo}}",
+            "cd /tmp/workspace/xxx-IMAGE-base-ami",
+            "/tmp/workspace/packer validate {{AmiType}}.json",
+            "/tmp/workspace/packer build {{AmiType}}.json"
+          ]
+        },
+        "CloudWatchOutputConfig" : { 
+          "CloudWatchLogGroupName": "IMAGE-AMI-Bakery",
+          "CloudWatchOutputEnabled": true
+        }
+      }
+    },
+    {
+      "name": "terminateInstance",
+      "action": "aws:changeInstanceState",
+      "maxAttempts": 3,
+      "onFailure": "Continue",
+      "inputs": {
+        "InstanceIds": [
+          "{{launchInstance.InstanceIds}}"
+        ],
+        "DesiredState": "terminated"
+      }
+    }
+  ]
+}
